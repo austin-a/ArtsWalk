@@ -101,6 +101,7 @@
             //navigator.geolocation.watchPosition(initMap, locationError);
 		}
 
+        
 		//query businesses
         queryTaskVenues = new esri.tasks.QueryTask("http://services.arcgis.com/a83cWFJpXhezKJzd/ArcGIS/rest/services/NewBestArtsWalkFall12/FeatureServer/0");
         //build query filter
@@ -109,7 +110,7 @@
         queryVenues.outFields = ["Business, ID"];
 		queryVenues.orderByFields = ["Business"];
 		queryVenues.where = "1=1"; //1 always equals 1, so all of the records will be displayed
-		queryTaskVenues.execute(queryVenues,listVenues);
+		
 		
 		//query artists
 		queryTaskArtists = new esri.tasks.QueryTask("http://services.arcgis.com/a83cWFJpXhezKJzd/ArcGIS/rest/services/NewBestArtsWalkFall12/FeatureServer/1");
@@ -124,8 +125,7 @@
         queryName.returnGeometry = false;
         queryName.outFields = ["Artist"];
 		queryName.orderByFields = ["Artist"];
-		queryName.where = "1=1";
-		queryTaskArtists.execute(queryArtists,listArtists);
+		queryName.where = "1=1";	
 		
         console.log("121");
 		//query events
@@ -135,14 +135,21 @@
         queryEvents.returnGeometry = false;
         queryEvents.outFields = ["Time, Day, Event, ID"];
 		queryEvents.orderByFields = ["Sort"];
-		queryEvents.where = "1=1";
-		queryTaskEvents.execute(queryEvents,rightNow);
-		queryTaskEvents.execute(queryEvents,showResultsFriday);
-		queryTaskEvents.execute(queryEvents,showResultsSaturday);
-		//queryTaskEvents.execute(queryEvents,showEvents);
-        console.log('100');
+		queryEvents.where = "1=1";	
+		
+        executeQueries();        
 	}
 	
+    function executeQueries() {
+        var dVenues, dArtists, dNow, dFriday, dSaturday, dList;
+        dVenues = queryTaskVenues.execute(queryVenues,listVenues);
+        dArtists = queryTaskArtists.execute(queryArtists,listArtists);
+        dNow = queryTaskEvents.execute(queryEvents,rightNow);
+		dFriday = queryTaskEvents.execute(queryEvents,showResultsFriday);
+		dSaturday = queryTaskEvents.execute(queryEvents,showResultsSaturday);
+        dList = new dojo.DeferredList([dVenues, dArtists, dNow, dFriday, dSaturday]);
+        dList.then($.mobile.hidePageLoadingMsg());
+    }
 	function getTheDay() {
 		var montharray=new Array("January","February","March","April","May","June","July","August","September","October","November","December")
 		var dayarray = new Array ("Sunday","Monday","Tuesday","Wednesday","Thursday","Friday","Saturday");
@@ -892,7 +899,6 @@
 				$('#myList').append('<li><a href="#artist" data-params="ID=' + featureAttributes["ID"] + '&Artist=' + featureAttributes["Artist"] + '" class="artist">' + featureAttributes["Artist"] + '</a></li>');
 			  }
 		}
-        $.mobile.hidePageLoadingMsg();
         $('#artistbtn').removeClass("ui-disabled").addClass("ui-enabled");
 	  }
 	  
@@ -910,7 +916,6 @@
 			$('#venueList').append('<li><a href="#venue" data-params="ID=' + featureAttributes["ID"] + '&Business=' + featureAttributes["Business"] + '" class="venue">' + featureAttributes["Business"] + '</a></li>'); //this link passes the business id into the next page
 		  }
 		}
-        $.mobile.hidePageLoadingMsg();
         $('#venuebtn').removeClass("ui-disabled").addClass("ui-enabled");
 	  }
 	  
