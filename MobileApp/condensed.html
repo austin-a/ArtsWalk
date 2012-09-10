@@ -99,7 +99,7 @@
 			//this uses the HTML 5 geolocation API
             navigator.geolocation.getCurrentPosition(initMap, locationError);
             //navigator.geolocation.watchPosition(initMap, locationError);
-		//}
+		}
 
 		//query businesses
         queryTaskVenues = new esri.tasks.QueryTask("http://services.arcgis.com/a83cWFJpXhezKJzd/ArcGIS/rest/services/NewBestArtsWalkFall12/FeatureServer/0");
@@ -430,6 +430,7 @@
 			f = "";
 		  }
 	    }
+        $('#schedulebtn').removeClass("ui-disabled").addClass("ui-enabled");
       }
 	  
 	  function getName() {
@@ -892,6 +893,7 @@
 			  }
 		}
         $.mobile.hidePageLoadingMsg();
+        $('#artistbtn').removeClass("ui-disabled").addClass("ui-enabled");
 	  }
 	  
 	  function listVenues(results) {
@@ -909,6 +911,7 @@
 		  }
 		}
         $.mobile.hidePageLoadingMsg();
+        $('#venuebtn').removeClass("ui-disabled").addClass("ui-enabled");
 	  }
 	  
 		function showWebsite(results1) {
@@ -1039,10 +1042,10 @@
 	</div>
 	<div data-role="content" data-theme="d">	
 		Welcome! This app will function as your virtual guide while you visit Arts Walk. You can find businesses, artists, and events using the buttons below.
-		<a href="#searchvenue" data-role="button" data-icon="search" data-theme="b" data-disabled="true">Search by venue</a>
-		<a href="#searchartist" data-role="button" data-icon="search" data-theme="b" data-disabled="true">Search artists and events</a>
+		<a href="#searchvenue" id="venuebtn" data-role="button" data-icon="search" data-theme="b" class="ui-disabled">Search by venue</a>
+		<a href="#searchartist" id="artistbtn" data-role="button" data-icon="search" data-theme="b" class="ui-disabled">Search artists and events</a>
 		<a href="#mapPage" data-role="button" data-icon="star" data-theme="b">Find on map</a> <!--rel=external was added here to disable the Ajax transitions which have a tendency to mess up pages with dynamic content-->
-		<a href="#friday" data-role="button" data-icon="info" data-theme="b">Event schedule</a>
+		<a href="#friday" id="schedulebtn" data-role="button" data-icon="info" data-theme="b" class="ui-disabled">Event schedule</a>
 		<a href="#rightnow" data-role="button" data-icon="check" data-theme="b">Happening now</a>
 	</div>
 	<div data-role="footer" class="footer-docs" data-theme="d">
