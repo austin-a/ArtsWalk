@@ -94,15 +94,7 @@
     
 	function init() {
         $.mobile.showPageLoadingMsg();
-        //get the current location
-        if (navigator.geolocation) {
-            //this uses the HTML 5 geolocation API
-            navigator.geolocation.getCurrentPosition(initMap, locationError);
-            //navigator.geolocation.watchPosition(initMap, locationError);
-        }
-        else {
-            initMap(0);
-        }
+        initMap(0);
 		//query businesses
         queryTaskVenues = new esri.tasks.QueryTask("http://services.arcgis.com/a83cWFJpXhezKJzd/ArcGIS/rest/services/NewBestArtsWalkFall12/FeatureServer/0");
         //build query filter
@@ -596,11 +588,8 @@
 			selectionLayer.setRenderer(selR);
 			map.addLayer(selectionLayer);
             console.log("1");
-			//zoomToLocation(ID);
+			zoomToLocation(ID);
             console.log("2");
-			resizeMap();
-		  //hookup jquery
-		  //$(document).ready(jQueryReady);
         });
         //add the world imagery from arcgis online
         console.log("0");
@@ -729,8 +718,12 @@
 	  function locationError(error) {
         switch (error.code) {
         case error.PERMISSION_DENIED:
-          console.log("Location not provided");
-		  initMap(0);
+        console.log("Location not provided");
+        var extent = new esri.geometry.Extent(-13682050, 5948629, -13679940, 5950043, new esri.SpatialReference({ wkid: 102100 }));
+        map.setExtent(extent);
+        $.mobile.hidePageLoadingMsg();
+        console.log(extent);
+        console.log(map.extent);
 		  break;
         case error.POSITION_UNAVAILABLE:
           console.log("Current location not available");
@@ -745,7 +738,6 @@
       }
 	  
 	  function zoomToLocation(features) {
-        console.log('Location, zoomed!');
        //$.mobile.hidePageLoadingMsg(); //true hides the dialog
         var points = [];
           if(features.coords){
@@ -773,7 +765,8 @@
                   }
               });
         }
-
+        console.log('The location has been zoomed to!');
+        $.mobile.hidePageLoadingMsg();
       }
 	  
 	  function jQueryReady() {
@@ -806,20 +799,21 @@
 				//query to retrieve other necessary data such as website based on venue ID
 			}
 		);
-		$('.map').live('click',
+		/*$('.map').live('click',
 			function(e) {
                 resizeMap();
 				params = $(e.target).jqmData("params");
 				console.log(params);
                 if(paramsObj != undefined) {
                     var paramsObj = dojo.queryToObject(params);
-                }
-                if(paramsObj != undefined) {
                     zoomToLocation(paramsObj);
+                } else {
+                    //showLocation();
+                    
                 }
 				//run some javascript based on the params to select features on map and zoom
 			}
-		);
+		);*/
 		$('.artist').live('click',
 			function(e) {
 				params = $(e.target).jqmData("params");
@@ -836,9 +830,21 @@
 		$('#searchartist').bind('pageshow',function() {
             $('#myList').listview('refresh');
 		});*/
-      }
-
+        $('#mapPage').live('pageshow',function(e) {
+            console.log(map.extent);
+            resizeMap();
+            params = $(e.target).jqmData("params");
+            console.log(params);
+            if(paramsObj != undefined) {
+                var paramsObj = dojo.queryToObject(params);
+                zoomToLocation(paramsObj);
+            } else {
+                showLocation();
+            }
+      });
+    }
       function showLocation() {
+        console.log(navigator.geolocation);
         if (navigator.geolocation) {
           $.mobile.showPageLoadingMsg();
           navigator.geolocation.getCurrentPosition(myLocation, locationError);
@@ -848,6 +854,7 @@
       function myLocation(location) {
         //$.mobile.hidePageLoadingMsg(); //true hides the dialog
         //check location
+        console.log('Now obtaining your position!');
         var pt;
         if (location.spatialReference && location.spatialReference.wkid === 102100) {
           pt = location;
@@ -858,6 +865,7 @@
         var symbol = new esri.symbol.PictureMarkerSymbol("here.png", 35, 35);
         map.graphics.add(new esri.Graphic(pt, symbol));
         map.centerAndZoom(pt,1);
+        $.mobile.hidePageLoadingMsg();
       }
 
       function orientationChanged() {
@@ -875,6 +883,7 @@
          $('#map').css("width", "auto");
           map.reposition();
           map.resize();
+          console.log('The map has been resized!');
         }
       }
 
@@ -1056,7 +1065,7 @@
 		Welcome! This app will function as your virtual guide while you visit Arts Walk. You can find businesses, artists, and events using the buttons below.
 		<a href="#searchvenue" id="venuebtn" data-role="button" data-icon="search" data-theme="b" class="ui-disabled">Search by venue</a>
 		<a href="#searchartist" id="artistbtn" data-role="button" data-icon="search" data-theme="b" class="ui-disabled">Search artists and events</a>
-		<a href="#mapPage" data-role="button" data-icon="star" data-theme="b">Find on map</a>
+		<a href="#mapPage" data-role="button" data-icon="star" data-theme="b" class="map">Find on map</a>
 		<a href="#friday" id="schedulebtn" data-role="button" data-icon="info" data-theme="b" class="ui-disabled">Event schedule</a>
 		<a href="#rightnow" data-role="button" data-icon="check" data-theme="b">Happening now</a>
 	</div>
