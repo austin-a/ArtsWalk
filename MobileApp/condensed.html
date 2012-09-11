@@ -94,14 +94,15 @@
     
 	function init() {
         $.mobile.showPageLoadingMsg();
-          //get the current location
-		if (navigator.geolocation) {
-			//this uses the HTML 5 geolocation API
+        //get the current location
+        if (navigator.geolocation) {
+            //this uses the HTML 5 geolocation API
             navigator.geolocation.getCurrentPosition(initMap, locationError);
             //navigator.geolocation.watchPosition(initMap, locationError);
-		}
-
-        
+        }
+        else {
+            initMap(0);
+        }
 		//query businesses
         queryTaskVenues = new esri.tasks.QueryTask("http://services.arcgis.com/a83cWFJpXhezKJzd/ArcGIS/rest/services/NewBestArtsWalkFall12/FeatureServer/0");
         //build query filter
@@ -555,7 +556,7 @@
       }
 	  
 	  function initMap(ID) {
-        console.log('101');
+        console.log('Map, launched!');
         //grab only the layers that can be rendered
         var lods = [{
           "level": 16,
@@ -595,7 +596,7 @@
 			selectionLayer.setRenderer(selR);
 			map.addLayer(selectionLayer);
             console.log("1");
-			zoomToLocation(ID);
+			//zoomToLocation(ID);
             console.log("2");
 			resizeMap();
 		  //hookup jquery
@@ -720,9 +721,9 @@
       }
 	  
 	  function viewVenues(graphic){
-		  var content = "venue4.html?ID=" + graphic.attributes.ID;
-		window.location.href = content;
-           
+          $.mobile.changePage('condensed.html#venue', {
+            //graphic.attributes.ID
+          });
       }
 	  
 	  function locationError(error) {
@@ -744,7 +745,7 @@
       }
 	  
 	  function zoomToLocation(features) {
-
+        console.log('Location, zoomed!');
        //$.mobile.hidePageLoadingMsg(); //true hides the dialog
         var points = [];
           if(features.coords){
@@ -807,10 +808,15 @@
 		);
 		$('.map').live('click',
 			function(e) {
+                resizeMap();
 				params = $(e.target).jqmData("params");
 				console.log(params);
-				var paramsObj = dojo.queryToObject(params);
-				initMap(paramsObj);
+                if(paramsObj != undefined) {
+                    var paramsObj = dojo.queryToObject(params);
+                }
+                if(paramsObj != undefined) {
+                    zoomToLocation(paramsObj);
+                }
 				//run some javascript based on the params to select features on map and zoom
 			}
 		);
@@ -830,9 +836,6 @@
 		$('#searchartist').bind('pageshow',function() {
             $('#myList').listview('refresh');
 		});*/
-		$('#mapPage').bind('pageshow',function() {
-			showLocation();
-		});
       }
 
       function showLocation() {
@@ -1053,7 +1056,7 @@
 		Welcome! This app will function as your virtual guide while you visit Arts Walk. You can find businesses, artists, and events using the buttons below.
 		<a href="#searchvenue" id="venuebtn" data-role="button" data-icon="search" data-theme="b" class="ui-disabled">Search by venue</a>
 		<a href="#searchartist" id="artistbtn" data-role="button" data-icon="search" data-theme="b" class="ui-disabled">Search artists and events</a>
-		<a href="#mapPage" data-role="button" data-icon="star" data-theme="b">Find on map</a> <!--rel=external was added here to disable the Ajax transitions which have a tendency to mess up pages with dynamic content-->
+		<a href="#mapPage" data-role="button" data-icon="star" data-theme="b">Find on map</a>
 		<a href="#friday" id="schedulebtn" data-role="button" data-icon="info" data-theme="b" class="ui-disabled">Event schedule</a>
 		<a href="#rightnow" data-role="button" data-icon="check" data-theme="b">Happening now</a>
 	</div>
