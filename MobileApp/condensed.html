@@ -148,8 +148,15 @@
 		dFriday = queryTaskEvents.execute(queryEvents,showResultsFriday);
 		dSaturday = queryTaskEvents.execute(queryEvents,showResultsSaturday);
         dList = new dojo.DeferredList([dVenues, dArtists, dNow, dFriday, dSaturday]);
-        dList.then($.mobile.hidePageLoadingMsg());
+        dList.then(
+            $('#schedulebtn').removeClass("ui-disabled").addClass("ui-enabled"),
+            $('#artistbtn').removeClass("ui-disabled").addClass("ui-enabled"),
+            $('#venuebtn').removeClass("ui-disabled").addClass("ui-enabled"),
+            $.mobile.hidePageLoadingMsg()
+        );
+        
     }
+    
 	function getTheDay() {
 		var montharray=new Array("January","February","March","April","May","June","July","August","September","October","November","December")
 		var dayarray = new Array ("Sunday","Monday","Tuesday","Wednesday","Thursday","Friday","Saturday");
@@ -437,7 +444,6 @@
 			f = "";
 		  }
 	    }
-        $('#schedulebtn').removeClass("ui-disabled").addClass("ui-enabled");
       }
 	  
 	  function getName() {
@@ -899,7 +905,6 @@
 				$('#myList').append('<li><a href="#artist" data-params="ID=' + featureAttributes["ID"] + '&Artist=' + featureAttributes["Artist"] + '" class="artist">' + featureAttributes["Artist"] + '</a></li>');
 			  }
 		}
-        $('#artistbtn').removeClass("ui-disabled").addClass("ui-enabled");
 	  }
 	  
 	  function listVenues(results) {
@@ -916,7 +921,6 @@
 			$('#venueList').append('<li><a href="#venue" data-params="ID=' + featureAttributes["ID"] + '&Business=' + featureAttributes["Business"] + '" class="venue">' + featureAttributes["Business"] + '</a></li>'); //this link passes the business id into the next page
 		  }
 		}
-        $('#venuebtn').removeClass("ui-disabled").addClass("ui-enabled");
 	  }
 	  
 		function showWebsite(results1) {
