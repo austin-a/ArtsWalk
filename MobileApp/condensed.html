@@ -142,13 +142,14 @@
 	}
 	
     function executeQueries() {
-        var dVenues, dArtists, dNow, dFriday, dSaturday, dList;
+        var dVenues, dArtists, dNow, dFriday, dSaturday, dList, dEvents;
         dVenues = queryTaskVenues.execute(queryVenues,listVenues);
         dArtists = queryTaskArtists.execute(queryArtists,listArtists);
         dNow = queryTaskEvents.execute(queryEvents,rightNow);
 		dFriday = queryTaskEvents.execute(queryEvents,showResultsFriday);
 		dSaturday = queryTaskEvents.execute(queryEvents,showResultsSaturday);
-		dList = new dojo.DeferredList([dVenues, dArtists, dNow, dFriday, dSaturday]);
+        dEvents = queryTaskEvents.execute(queryEvents,listEvents);
+		dList = new dojo.DeferredList([dVenues, dArtists, dNow, dFriday, dSaturday, dEvents]);
         dList.then(function(results){
             $('#schedulebtn').removeClass("ui-disabled").addClass("ui-enabled");
             $('#artistbtn').removeClass("ui-disabled").addClass("ui-enabled");
@@ -292,7 +293,7 @@
 								if (time-1 <= second && time+1 >= one) {
 								//if (sooner <= one && later >= one) {
 									if (u < 1) {
-										f = "<li><a href='#venue' data-params='ID=" + events.features[i].attributes["ID"] + "' class='venue'>" + featureAttributes[att] + " ";
+										f = "<li><a href='#venue' data-params='ID=" + events.features[i].attributes["ID"] + "' data-transition='slide' class='venue'>" + featureAttributes[att] + " ";
 										pass = pass + events.features[i].attributes["ID"] + ",";
 										u++;
 									}
@@ -335,7 +336,7 @@
 					for (att in featureAttributes) {
 						if (att != "Day" && att != "ID") {
 							if (u < 1) {
-								f = "<li><a href='#venue' data-params='ID=" + events.features[i].attributes["ID"] + "' class='venue'>" + featureAttributes[att] + " ";
+								f = "<li><a href='#venue' data-params='ID=" + events.features[i].attributes["ID"] + "' data-transition='slide' class='venue'>" + featureAttributes[att] + " ";
 								pass = pass + events.features[i].attributes["ID"] + ",";
 								u++;
 							}
@@ -355,7 +356,7 @@
 			for (att in featureAttributes) {
 				if (att != "Day" && att != "ID") {
 					if (u < 1) {
-						f = "<li><a href='#venue' data-params='ID=" + events.features[i].attributes["ID"] + "' class='venue'>" + featureAttributes[att] + " ";
+						f = "<li><a href='#venue' data-params='ID=" + events.features[i].attributes["ID"] + "' data-transition='slide' class='venue'>" + featureAttributes[att] + " ";
 						pass = pass + events.features[i].attributes["ID"] + ",";
 						u++;
 					}
@@ -396,7 +397,7 @@
 			for (att in featureAttributes) {
 				if (att != "Day" && att != "ID") { //this ensures that only the time and event name are displayed
 					if (u < 1) {
-						f =  "<li><a href='#venue' data-params='ID=" + results1.features[i].attributes["ID"] + "' class='venue'>" + featureAttributes[att] + " "; //displays the time of the event
+						f =  "<li><a href='#venue' data-params='ID=" + results1.features[i].attributes["ID"] + "' data-transition='slide' class='venue'>" + featureAttributes[att] + " "; //displays the time of the event
 						u++;
 					}
 					else {
@@ -421,7 +422,7 @@
 			for (att in featureAttributes) {
 				if (att != "Day" && att != "ID") {
 					if (u < 1) {
-						f =  "<li><a href='#venue' data-params='ID=" + results1.features[i].attributes["ID"] + "' class='venue'>" + featureAttributes[att] + " ";
+						f =  "<li><a href='#venue' data-params='ID=" + results1.features[i].attributes["ID"] + "' data-transition='slide' class='venue'>" + featureAttributes[att] + " ";
 						u++;
 					}
 					else {
@@ -437,7 +438,7 @@
 			for (att in featureAttributes) {
 				if (att != "Day" && att != "ID") {
 					if (u < 1) {
-						f = "<li><a href='#venue' data-params='ID=" + results1.features[i].attributes["ID"] + "' class='venue'>" + featureAttributes[att] + " "; //the event time is appended here
+						f = "<li><a href='#venue' data-params='ID=" + results1.features[i].attributes["ID"] + "' data-transition='slide' class='venue'>" + featureAttributes[att] + " "; //the event time is appended here
 						u++;
 					}
 					else {
@@ -530,7 +531,7 @@
 			  for (att in featureAttributes) {
 				if (att != "Day" && att != "ID") {
 					if (u < 1) {
-						s = s + "<li><a href='#venue' data-params='ID=" + results2.features[i].attributes["ID"] + "' class='venue'>" + featureAttributes[att] + " ";
+						s = s + "<li><a href='#venue' data-params='ID=" + results2.features[i].attributes["ID"] + "' data-transition='slide' class='venue'>" + featureAttributes[att] + " ";
 						u++;
 					}
 					else {
@@ -616,7 +617,7 @@
 			//map.addLayers([artsWalk, selectionLayer]);
             console.log("1");
 			//zoomToLocation(ID);
-            console.log("2");
+            $('#mapbtn').removeClass("ui-disabled").addClass("ui-enabled");
         });
         //add the world imagery from arcgis online
         console.log("0");
@@ -917,7 +918,7 @@
             } else {
                 showLocation();
             }
-      });
+        });
 		$('.mapVenue').live('click',function(e) {
             console.log(map.extent);
             //resizeMap();
@@ -995,6 +996,20 @@
 
       }
 	  
+      function listEvents(results2) {
+        $('#myList').append('<li data-role="list-divider" data-theme="b">Events</li>');
+		for (var i=0, il=results2.features.length; i<il; i++) {
+			var featureAttributes = results2.features[i].attributes;
+			var count = 0;
+			for (att in featureAttributes) {
+				count++
+			}
+			for (var g=0, gl=count/4; g<gl; g++) {
+				$('#myList').append('<li><a href="#venue" data-params="ID=' + featureAttributes["ID"] + '" data-transition="slide" class="venue">' + featureAttributes["Event"] + '</a></li>');
+			}
+		}
+	  }
+      
 	  function listArtists(results1) {
         var s = "";
 		var f = "";
@@ -1007,7 +1022,7 @@
 			count++;
 		  }
 		  for (var g=0, gl=count/2; g<gl; g++) { //This code was used because the program is looping through the business field and the ID field, but we only want one listing for each business
-				$('#myList').append('<li><a href="#artist" data-params="ID=' + featureAttributes["ID"] + '&Artist=' + featureAttributes["Artist"] + '" class="artist">' + featureAttributes["Artist"] + '</a></li>');
+				$('#myList').append('<li><a href="#artist" data-params="ID=' + featureAttributes["ID"] + '&Artist=' + featureAttributes["Artist"] + '" data-transition="slide" class="artist">' + featureAttributes["Artist"] + '</a></li>');
 			  }
 		}
 	  }
@@ -1023,7 +1038,7 @@
 			count++;
 		  }
 		  for (var g=0, gl=count/2; g<gl; g++) { //This code was used because the program is looping through the business field and the ID field, but we only want one listing for each business
-			$('#venueList').append('<li><a href="#venue" data-params="ID=' + featureAttributes["ID"] + '&Business=' + featureAttributes["Business"] + '" class="venue">' + featureAttributes["Business"] + '</a></li>'); //this link passes the business id into the next page
+			$('#venueList').append('<li><a href="#venue" data-params="ID=' + featureAttributes["ID"] + '&Business=' + featureAttributes["Business"] + '" data-transition="slide" class="venue">' + featureAttributes["Business"] + '</a></li>'); //this link passes the business id into the next page
 		  }
 		}
 	  }
@@ -1040,7 +1055,7 @@
 				var site = results1.features[0].attributes["Website"];
 				$('#website').append("<a href='" + site + "' data-role='button' data-theme='b'>Venue website</a>").trigger('create');
 			}*/
-			$('#onmap').append('<a href="#mapPage" data-params="ID=' + results1.features[0].attributes["ID"] + '" data-role="button" data-theme="b" class="mapVenue">Map</a>').trigger('create');
+			$('#onmap').append('<a href="#mapPage" data-params="ID=' + results1.features[0].attributes["ID"] + '" data-role="button" data-theme="b" data-transition="pop" class="mapVenue">Map</a>').trigger('create');
             params = "ID=" + results1.features[0].attributes["ID"];
 		}
 		
@@ -1128,8 +1143,8 @@
 			console.log(results1);
 			$('#artistLocation').empty();
 			$('#artistMap').empty();
-			$('#artistLocation').append("<a href='#venue' data-params='ID=" + results1.features[0].attributes["ID"] + "&Business=" + results1.features[0].attributes["Business"] + "' data-role='button' data-theme='b' class='artistVenue'>" + results1.features[0].attributes["Business"] + "</a>").trigger('create'); //this code passes the business name as well as the ID
-			$('#artistMap').append('<a href="#mapPage" data-params="ID=' + results1.features[0].attributes["ID"] + '" data-role="button" data-theme="b" class="mapVenue">Map</a>').trigger('create');
+			$('#artistLocation').append("<a href='#venue' data-params='ID=" + results1.features[0].attributes["ID"] + "&Business=" + results1.features[0].attributes["Business"] + "' data-role='button' data-theme='b' data-transition='fade' class='artistVenue'>" + results1.features[0].attributes["Business"] + "</a>").trigger('create'); //this code passes the business name as well as the ID
+			$('#artistMap').append('<a href="#mapPage" data-params="ID=' + results1.features[0].attributes["ID"] + '" data-role="button" data-theme="b" data-transition="pop" class="mapVenue">Map</a>').trigger('create');
 		}
 		
 		function showArtist(results3) {
@@ -1138,7 +1153,7 @@
 			$('#artistVenue').append("<li data-role='list-divider'>Art on display</li>");
 			for (var i = 0, il = results3.features.length; i < il; i++) { //iterate through all of the events
 				var featureAttributes = results3.features[i].attributes;
-				$('#artistVenue').append("<li><a href='#artist' data-params='ID=" + featureAttributes["ID"] + "&Artist=" + featureAttributes["Artist"] + "' data-role='button' class='artist'>" + featureAttributes["Artist"] + "</a></li>");
+				$('#artistVenue').append("<li><a href='#artist' data-params='ID=" + featureAttributes["ID"] + "&Artist=" + featureAttributes["Artist"] + "' data-role='button' data-transition='slide' class='artist'>" + featureAttributes["Artist"] + "</a></li>");
 			}
 			$('#artistVenue').listview();
 			$('#artistVenue').listview('refresh');
@@ -1157,11 +1172,11 @@
 	</div>
 	<div data-role="content" data-theme="d">	
 		Welcome! This app will function as your virtual guide while you visit Arts Walk. You can find businesses, artists, and events using the buttons below.
-		<a href="#searchvenue" id="venuebtn" data-role="button" data-icon="search" data-theme="b" class="ui-disabled">Search by venue</a>
-		<a href="#searchartist" id="artistbtn" data-role="button" data-icon="search" data-theme="b" class="ui-disabled">Search artists and events</a>
-		<a href="#mapPage" data-role="button" data-icon="star" data-theme="b" class="mapPage">Find on map</a>
-		<a href="#friday" id="schedulebtn" data-role="button" data-icon="info" data-theme="b" class="ui-disabled">Event schedule</a>
-		<a href="#rightnow" id="nowbtn" data-role="button" data-icon="check" data-theme="b" class="ui-disabled">Happening now</a>
+		<a href="#searchvenue" id="venuebtn" data-role="button" data-icon="search" data-theme="b" data-transition="slide" class="ui-disabled">Search by venue</a>
+		<a href="#searchartist" id="artistbtn" data-role="button" data-icon="search" data-theme="b" data-transition="slide" class="ui-disabled">Search artists and events</a>
+		<a href="#mapPage" id="mapbtn" data-role="button" data-icon="star" data-theme="b" data-transition="pop" class="mapPage ui-disabled">Find on map</a>
+		<a href="#friday" id="schedulebtn" data-role="button" data-icon="info" data-theme="b" data-transition="slide" class="ui-disabled">Event schedule</a>
+		<a href="#rightnow" id="nowbtn" data-role="button" data-icon="check" data-theme="b" data-transition="slide" class="ui-disabled">Happening now</a>
 	</div>
 	<div data-role="footer" class="footer-docs" data-theme="d">
 		<div class="right"><a href="#about" data-role="button" data-mini="true" data-inline="true" data-rel="dialog" data-ajax="true" data-transition="pop" data-theme="b">About</a></div>
@@ -1228,7 +1243,7 @@
 	<div id="header" data-role="header" data-theme='b'>
 		<h1>Olympia Arts Walk</h1>
 		<a href="#index" data-rel="back" data-theme="b" data-icon="back" data-transition="slide" data-type="button" data-inline="true">Back</a>
-		<a href="#index" data-theme="b" data-icon="home" data-transition="slide" data-direction="reverse" data-type="button" data-inline="true" data-iconpos='notext'></a>
+		<a href="#index" data-theme="b" data-icon="home" data-transition="pop" data-direction="reverse" data-type="button" data-inline="true" data-iconpos='notext'></a>
 		<a onclick='showLocation()' id='geolocation' style='right: 40px; float: right; position: absolute; display: inline;' data-theme='b' data-transition='fade' data-ajax='false' data-icon='geolocation' data-iconpos='notext' data-inline="true"></a>
 	</div>
 	<div data-role="content" id="mapcontent" data-theme='d' style="padding:0;width:100%;height:100%;">
