@@ -565,6 +565,14 @@
         console.log('Map, launched!');
         //grab only the layers that can be rendered
         var lods = [{
+          "level": 14,
+          "resolution": 9.55462853563415,
+          "scale": 36111.909643
+        }, {
+          "level": 15,
+          "resolution": 4.77731426794937,
+          "scale": 18055.954822
+        }, {
           "level": 16,
           "resolution": 2.388657133974685,
           "scale": 9027.977411
@@ -611,6 +619,8 @@
         });
         //add the world imagery from arcgis online
         console.log("0");
+        var basemap1 = new esri.layers.ArcGISTiledMapServiceLayer("http://server.arcgisonline.com/ArcGIS/rest/services/World_Topo_Map/MapServer");
+        map.addLayer(basemap1);
         var basemap = new esri.layers.ArcGISTiledMapServiceLayer("http://nwdemo1.esri.com/arcgis/rest/services/Olympia/Olympia_CM/MapServer");
         map.addLayer(basemap);
         //could add more to this template to display more info from feature 
@@ -1163,7 +1173,7 @@
 	</div>
 	<div data-role="content">	
 		<p>Olympia Arts Walk Mobile Guide</p>
-		<p>v1.1.0, September 2012</p>
+		<p>v1.2.0, September 2012</p>
 		<p>Developed by Esri&reg; for the City of Olympia, WA</p>
 	</div>
 </div>
