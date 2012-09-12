@@ -800,10 +800,38 @@
         $('#mapPage').live('pageshow', function (event, ui) {
           resizeMap();
         });
-		$('.venue').live('click',
+		$('.artistVenue').live('vclick',
+			function(e) {
+				
+				//params = $(e.target).jqmData("params");
+                params = $('.artistVenue').data("params")
+				console.log(params);
+				var paramsObj = dojo.queryToObject(params);
+				var queryEventsVenue = new esri.tasks.Query();
+				queryEventsVenue.returnGeometry = false;
+				queryEventsVenue.outFields = ["Time, Day, Event"];
+				queryEventsVenue.orderByFields = ["Sort"];
+				queryEventsVenue.where = "ID= " + paramsObj["ID"];
+				queryTaskEvents.execute(queryEventsVenue,showEvents);
+				
+				queryArtists.where = "ID= " + paramsObj["ID"];
+				queryTaskArtists.execute(queryArtists,showArtist);
+                
+                var queryVenueName = new esri.tasks.Query();
+                queryVenueName.returnGeometry = false;
+                queryVenueName.outFields = ["Business", "ID"];
+                queryVenueName.where = "ID= " + paramsObj["ID"];
+                queryTaskVenues.execute(queryVenueName,showWebsite);
+				//run some javascript based on the params to select features on map and zoom
+				//clear existing venue page content or at least set whats there = "" and then the new value
+				//query to retrieve other necessary data such as website based on venue ID
+			}
+		);
+        $('.venue').live('vclick',
 			function(e) {
 				
 				params = $(e.target).jqmData("params");
+                //params = $('.venue').data("params")
 				console.log(params);
 				var paramsObj = dojo.queryToObject(params);
 				var queryEventsVenue = new esri.tasks.Query();
@@ -841,7 +869,7 @@
 				//run some javascript based on the params to select features on map and zoom
 			}
 		);*/
-		$('.artist').live('click',
+		$('.artist').live('vclick',
 			function(e) {
 				params = $(e.target).jqmData("params");
 				var paramsObj = dojo.queryToObject(params);
@@ -857,7 +885,7 @@
 		$('#searchartist').bind('pageshow',function() {
             $('#myList').listview('refresh');
 		});*/
-        /*$('#mapPage').live('pageshow',function(e) {
+        $('.mapPage').live('pageshow',function(e) {
             console.log(map.extent);
             resizeMap();
             params = $(e.target).jqmData("params");
@@ -868,11 +896,12 @@
             } else {
                 showLocation();
             }
-      });*/
+      });
 		$('.mapVenue').live('click',function(e) {
             console.log(map.extent);
             resizeMap();
-            params = $('.mapVenue').data("params");
+            //params = $('.mapVenue').data("params");
+            //params = $(e.target).jqmData("params");
             console.log(params);
             if(params != undefined) {
                 var paramsObj = dojo.queryToObject(params);
@@ -991,6 +1020,7 @@
 				$('#website').append("<a href='" + site + "' data-role='button' data-theme='b'>Venue website</a>").trigger('create');
 			}*/
 			$('#onmap').append('<a href="#mapPage" data-params="ID=' + results1.features[0].attributes["ID"] + '" data-role="button" data-theme="b" class="mapVenue">Map</a>').trigger('create');
+            params = "ID=" + results1.features[0].attributes["ID"];
 		}
 		
 		function showEvents(results2) {
@@ -1077,7 +1107,7 @@
 			console.log(results1);
 			$('#artistLocation').empty();
 			$('#artistMap').empty();
-			$('#artistLocation').append("<a href='#venue' data-params='ID=" + results1.features[0].attributes["ID"] + "&Business=" + results1.features[0].attributes["Business"] + "' data-role='button' data-theme='b' class='venue'>" + results1.features[0].attributes["Business"] + "</a>").trigger('create'); //this code passes the business name as well as the ID
+			$('#artistLocation').append("<a href='#venue' data-params='ID=" + results1.features[0].attributes["ID"] + "&Business=" + results1.features[0].attributes["Business"] + "' data-role='button' data-theme='b' class='artistVenue'>" + results1.features[0].attributes["Business"] + "</a>").trigger('create'); //this code passes the business name as well as the ID
 			$('#artistMap').append('<a href="#mapPage" data-params="ID=' + results1.features[0].attributes["ID"] + '" data-role="button" data-theme="b" class="mapVenue">Map</a>').trigger('create');
 		}
 		
@@ -1108,7 +1138,7 @@
 		Welcome! This app will function as your virtual guide while you visit Arts Walk. You can find businesses, artists, and events using the buttons below.
 		<a href="#searchvenue" id="venuebtn" data-role="button" data-icon="search" data-theme="b" class="ui-disabled">Search by venue</a>
 		<a href="#searchartist" id="artistbtn" data-role="button" data-icon="search" data-theme="b" class="ui-disabled">Search artists and events</a>
-		<a href="#mapPage" data-role="button" data-icon="star" data-theme="b" class="map">Find on map</a>
+		<a href="#mapPage" data-role="button" data-icon="star" data-theme="b" class="mapPage">Find on map</a>
 		<a href="#friday" id="schedulebtn" data-role="button" data-icon="info" data-theme="b" class="ui-disabled">Event schedule</a>
 		<a href="#rightnow" data-role="button" data-icon="check" data-theme="b">Happening now</a>
 	</div>
