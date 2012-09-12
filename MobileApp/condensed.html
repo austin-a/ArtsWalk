@@ -23,6 +23,12 @@
 	body {
       font-family: Arial, Helvetica, sans-serif;
     }
+    
+    .center-wrapper {
+        text-align: center;
+        width: 200px;
+        margin:0 auto;
+    }
     @-webkit-keyframes pulse {
       0% {
       }
@@ -75,15 +81,7 @@
 	
 	h4 {text-align: center;} <!--this was added to the stylesheet because the jQuery mobile stylesheet was clipping the page title in the header.-->
     
-    .center-wrapper {
-    text-align: center;
-    width: 300px;
-    margin:0 auto;
-    margin-left:auto;
-    margin-right:auto;
-    align:center;
-    text-align:center;
-    }
+
 </style>
 <script type="text/javascript">
 	dojo.require("esri.map");
@@ -251,8 +249,8 @@
 		var time = getTheTime();
 		//use these to test the program and set the day and time.
 		//var time = 12;
-		var day = getTheDay();
-		//var day = 6;
+		//var day = getTheDay();
+		var day = 6;
 		var u = 0;
 		var l = 0;
 		var c = 0;
@@ -373,7 +371,7 @@
 		//$('#now').listview('refresh');
 		}
 		if (f == "") {
-			$('#empty').append("</br><div align='center'>No events at this time</div><a href='friday2.html' data-role='button' data-theme='b'>Schedule</a>").trigger('create');
+			$('#empty').append("</br><div align='center'>No events at this time</div><a href='#friday' data-role='button' data-theme='b'>Schedule</a>").trigger('create');
 		}
 		pass = pass.slice(0,pass.length-1);
 		//$('#onmap').append('<a href="#mapPage" data-params="ID=' + pass + '" data-role="button" data-theme="b" data-inline="true" class="map">Map</a>').trigger('create');
@@ -790,8 +788,10 @@
                   //zoom to extent of all graphics 
                   if(featureSet.features.length === 1){
                     //only one so centerAt
-                    //map.centerAt(featureSet.features[0].geometry);
-					map.centerAndZoom(featureSet.features[0].geometry, 1);
+                    esri.config.defaults.map.panDuration = 0;
+                    map.centerAt(featureSet.features[0].geometry);
+                    esri.config.defaults.map.panDuration = 350;
+					//map.centerAndZoom(featureSet.features[0].geometry, 1);
                   }else{
                     var extent = esri.graphicsExtent(featureSet.features);
                     map.setExtent(extent); //This doesn't seem to set the scale properly.
