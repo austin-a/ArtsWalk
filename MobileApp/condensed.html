@@ -6,7 +6,8 @@
 	<meta http-equiv="X-UA-Compatible" content="IE=7,IE=9" />
 	<!--The viewport meta tag is used to improve the presentation and behavior
 	of the samples on iOS devices-->
-	<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no"/>
+	<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,minimum-scale=1,user-scalable=no" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
 	<meta charset="utf-8">
 	<title>Olympia Arts Walk</title>
 	<link rel="stylesheet" href="themes/Olympia.min.css" />
@@ -42,6 +43,7 @@
 
    .page-map, #mapcontent, #map, #map_root {
             height: 100%;
+			width: 100%;
             padding: 0;
             margin:0;
         }
@@ -93,6 +95,14 @@
 	var pass = "";
     
 	function init() {
+		var supportsOrientationChange = "onorientationchange" in window,
+          orientationEvent = supportsOrientationChange ? "orientationchange" : "resize";
+
+        window.addEventListener(orientationEvent, function () {
+          orientationChanged();
+        }, false);
+	
+	
         $.mobile.showPageLoadingMsg();
         initMap(0);
 		//query businesses
@@ -140,12 +150,13 @@
         dNow = queryTaskEvents.execute(queryEvents,rightNow);
 		dFriday = queryTaskEvents.execute(queryEvents,showResultsFriday);
 		dSaturday = queryTaskEvents.execute(queryEvents,showResultsSaturday);
-        dList = new dojo.DeferredList([dVenues, dArtists, dNow, dFriday, dSaturday]);
-        dList.then(
-            $('#schedulebtn').removeClass("ui-disabled").addClass("ui-enabled"),
-            $('#artistbtn').removeClass("ui-disabled").addClass("ui-enabled"),
-            $('#venuebtn').removeClass("ui-disabled").addClass("ui-enabled"),
-            $.mobile.hidePageLoadingMsg()
+		dList = new dojo.DeferredList([dVenues, dArtists, dNow, dFriday, dSaturday]);
+        dList.then(function(results){
+            $('#schedulebtn').removeClass("ui-disabled").addClass("ui-enabled");
+            $('#artistbtn').removeClass("ui-disabled").addClass("ui-enabled");
+            $('#venuebtn').removeClass("ui-disabled").addClass("ui-enabled");
+            $.mobile.hidePageLoadingMsg();
+			}
         );
         
     }
@@ -358,8 +369,8 @@
 		  else {
 			f = "";
 		  }
-		$('#now').listview();
-		$('#now').listview('refresh');
+		//$('#now').listview();
+		//$('#now').listview('refresh');
 		}
 		if (f == "") {
 			$('#empty').append("</br><div align='center'>No events at this time</div><a href='friday2.html' data-role='button' data-theme='b'>Schedule</a>").trigger('create');
@@ -588,7 +599,7 @@
 			selectionLayer.setRenderer(selR);
 			map.addLayer(selectionLayer);
             console.log("1");
-			zoomToLocation(ID);
+			//zoomToLocation(ID);
             console.log("2");
         });
         //add the world imagery from arcgis online
@@ -726,7 +737,7 @@
         
         var queryVenueName = new esri.tasks.Query();
         queryVenueName.returnGeometry = false;
-        queryVenueName.outFields = ["Business"];
+        queryVenueName.outFields = ["Business", "ID"];
         queryVenueName.where = "ID= " + graphic.attributes.ID;
         queryTaskVenues.execute(queryVenueName,showWebsite);
       }
@@ -786,7 +797,7 @@
       }
 	  
 	  function jQueryReady() {
-        $('#mapPage').bind('pageshow', function (event, ui) {
+        $('#mapPage').live('pageshow', function (event, ui) {
           resizeMap();
         });
 		$('.venue').live('click',
@@ -807,7 +818,7 @@
                 
                 var queryVenueName = new esri.tasks.Query();
                 queryVenueName.returnGeometry = false;
-                queryVenueName.outFields = ["Business"];
+                queryVenueName.outFields = ["Business", "ID"];
                 queryVenueName.where = "ID= " + paramsObj["ID"];
                 queryTaskVenues.execute(queryVenueName,showWebsite);
 				//run some javascript based on the params to select features on map and zoom
@@ -846,7 +857,7 @@
 		$('#searchartist').bind('pageshow',function() {
             $('#myList').listview('refresh');
 		});*/
-        $('#mapPage').live('pageshow',function(e) {
+        /*$('#mapPage').live('pageshow',function(e) {
             console.log(map.extent);
             resizeMap();
             params = $(e.target).jqmData("params");
@@ -854,6 +865,18 @@
             if(params != undefined) {
                 var paramsObj = dojo.queryToObject(params);
                 zoomToLocation(paramsObj);
+            } else {
+                showLocation();
+            }
+      });*/
+		$('.mapVenue').live('click',function(e) {
+            console.log(map.extent);
+            resizeMap();
+            params = $('.mapVenue').data("params");
+            console.log(params);
+            if(params != undefined) {
+                var paramsObj = dojo.queryToObject(params);
+                zoomToLocation(paramsObj.ID);
             } else {
                 showLocation();
             }
@@ -886,20 +909,24 @@
 
       function orientationChanged() {
         if (map) {
-          resizeMap();
+			map.reposition();
+			map.resize();
         }
       }
 
       function resizeMap() {
         if (map) {
           //get header height and subtract from screen height
-          var ht = screen.height -dojo.position(dojo.byId('header')).h;
+          var ht = dojo.window.getBox().h-dojo.position(dojo.byId('header')).h;
 
-         $('#map').css("height",ht );
-         $('#map').css("width", "auto");
-          map.reposition();
-          map.resize();
-          console.log('The map has been resized!');
+			$('#map').css("height",ht );
+         //$('#map').css("width", "auto");
+			//$('#map').css("height",screen.height);
+			$('#map').css("width","auto");
+
+			map.reposition();
+			map.resize();
+         console.log('The map has been resized!');
         }
       }
 
@@ -963,7 +990,7 @@
 				var site = results1.features[0].attributes["Website"];
 				$('#website').append("<a href='" + site + "' data-role='button' data-theme='b'>Venue website</a>").trigger('create');
 			}*/
-			$('#onmap').append('<a href="#mapPage" data-params="ID=' + results1.features[0].attributes["ID"] + '" data-role="button" data-theme="b" class="map">Map</a>').trigger('create');
+			$('#onmap').append('<a href="#mapPage" data-params="ID=' + results1.features[0].attributes["ID"] + '" data-role="button" data-theme="b" class="mapVenue">Map</a>').trigger('create');
 		}
 		
 		function showEvents(results2) {
@@ -1051,7 +1078,7 @@
 			$('#artistLocation').empty();
 			$('#artistMap').empty();
 			$('#artistLocation').append("<a href='#venue' data-params='ID=" + results1.features[0].attributes["ID"] + "&Business=" + results1.features[0].attributes["Business"] + "' data-role='button' data-theme='b' class='venue'>" + results1.features[0].attributes["Business"] + "</a>").trigger('create'); //this code passes the business name as well as the ID
-			$('#artistMap').append('<a href="#mapPage" data-params="ID=' + results1.features[0].attributes["ID"] + '" data-role="button" data-theme="b" class="map">Map</a>').trigger('create');
+			$('#artistMap').append('<a href="#mapPage" data-params="ID=' + results1.features[0].attributes["ID"] + '" data-role="button" data-theme="b" class="mapVenue">Map</a>').trigger('create');
 		}
 		
 		function showArtist(results3) {
@@ -1153,7 +1180,7 @@
 		<a href="#index" data-theme="b" data-icon="home" data-transition="slide" data-direction="reverse" data-type="button" data-inline="true" data-iconpos='notext'></a>
 		<a onclick='showLocation()' id='geolocation' style='right: 40px; float: right; position: absolute; display: inline;' data-theme='b' data-transition='fade' data-ajax='false' data-icon='geolocation' data-iconpos='notext' data-inline="true"></a>
 	</div>
-	<div data-role="content" id="mapcontent" data-theme='d'>
+	<div data-role="content" id="mapcontent" data-theme='d' style="padding:0;width:100%;height:100%;">
 		<div id="map">
 			<div style="right: 0%; position: absolute; float: right; z-index: 5000;">
 				<input type="checkbox" data-inline="true" checked="checked" name="checkbox-1" id="custom" class="custom" data-theme='b'  data-mini="true" onclick="updateLayerVisibility();"/>
