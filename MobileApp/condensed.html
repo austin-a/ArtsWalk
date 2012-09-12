@@ -153,6 +153,7 @@
             $('#schedulebtn').removeClass("ui-disabled").addClass("ui-enabled");
             $('#artistbtn').removeClass("ui-disabled").addClass("ui-enabled");
             $('#venuebtn').removeClass("ui-disabled").addClass("ui-enabled");
+            $('#nowbtn').removeClass("ui-disabled").addClass("ui-enabled");
             $.mobile.hidePageLoadingMsg();
 			}
         );
@@ -1160,7 +1161,7 @@
 		<a href="#searchartist" id="artistbtn" data-role="button" data-icon="search" data-theme="b" class="ui-disabled">Search artists and events</a>
 		<a href="#mapPage" data-role="button" data-icon="star" data-theme="b" class="mapPage">Find on map</a>
 		<a href="#friday" id="schedulebtn" data-role="button" data-icon="info" data-theme="b" class="ui-disabled">Event schedule</a>
-		<a href="#rightnow" data-role="button" data-icon="check" data-theme="b">Happening now</a>
+		<a href="#rightnow" id="nowbtn" data-role="button" data-icon="check" data-theme="b" class="ui-disabled">Happening now</a>
 	</div>
 	<div data-role="footer" class="footer-docs" data-theme="d">
 		<div class="right"><a href="#about" data-role="button" data-mini="true" data-inline="true" data-rel="dialog" data-ajax="true" data-transition="pop" data-theme="b">About</a></div>
