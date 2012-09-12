@@ -88,7 +88,7 @@
 	dojo.require("esri.dijit.Legend");
 	dojo.require("esri.arcgis.utils");
 	dojo.require("esri.tasks.query");
-
+    
 	var queryTaskEvents, queryEvents, query2, map, artsWalk, selectionLayer, template, params, queryTaskArtists, queryTaskVenues, queryVenues, queryName, queryArtists;
 	var pass = "";
     
@@ -712,7 +712,23 @@
 	  function viewVenues(graphic){
           $.mobile.changePage('condensed.html#venue', {
             //graphic.attributes.ID
+            
           });
+        var queryEventsVenue = new esri.tasks.Query();
+        queryEventsVenue.returnGeometry = false;
+        queryEventsVenue.outFields = ["Time, Day, Event"];
+        queryEventsVenue.orderByFields = ["Sort"];
+        queryEventsVenue.where = "ID= " + graphic.attributes.ID;
+        queryTaskEvents.execute(queryEventsVenue,showEvents);
+        
+        queryArtists.where = "ID= " + graphic.attributes.ID;
+        queryTaskArtists.execute(queryArtists,showArtist);
+        
+        var queryVenueName = new esri.tasks.Query();
+        queryVenueName.returnGeometry = false;
+        queryVenueName.outFields = ["Business"];
+        queryVenueName.where = "ID= " + graphic.attributes.ID;
+        queryTaskVenues.execute(queryVenueName,showWebsite);
       }
 	  
 	  function locationError(error) {
@@ -835,7 +851,7 @@
             resizeMap();
             params = $(e.target).jqmData("params");
             console.log(params);
-            if(paramsObj != undefined) {
+            if(params != undefined) {
                 var paramsObj = dojo.queryToObject(params);
                 zoomToLocation(paramsObj);
             } else {
@@ -947,7 +963,7 @@
 				var site = results1.features[0].attributes["Website"];
 				$('#website').append("<a href='" + site + "' data-role='button' data-theme='b'>Venue website</a>").trigger('create');
 			}*/
-			$('#onmap').append('<a href="#mapPage" data-params="ID=' + results1["ID"] + '" data-role="button" data-theme="b" class="map">Map</a>').trigger('create');
+			$('#onmap').append('<a href="#mapPage" data-params="ID=' + results1.features[0].attributes["ID"] + '" data-role="button" data-theme="b" class="map">Map</a>').trigger('create');
 		}
 		
 		function showEvents(results2) {
