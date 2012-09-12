@@ -255,7 +255,7 @@
 		var l = 0;
 		var c = 0;
 		var s = 0;
-		var f, eventtime;
+		var f, eventtime, check;
 		var dayarray = new Array ("Sunday","Monday","Tuesday","Wednesday","Thursday","Friday","Saturday");
 		var sooner = time - 1;
 		var later = time + 1;
@@ -327,6 +327,7 @@
 						}
 					}	
 					$('#now').append(f);
+                    check = 1;
 				}
 				//End of copied code
 				else if (time-1 <= second && time+1 >= one) {
@@ -344,6 +345,7 @@
 						}
 					}
 					$('#now').append(f);
+                    check = 1;
 				}
 			
 			}
@@ -363,6 +365,7 @@
 				}
 			  }
 			  $('#now').append(f);
+              check = 1;
 		  }
 		  else {
 			f = "";
@@ -370,7 +373,7 @@
 		//$('#now').listview();
 		//$('#now').listview('refresh');
 		}
-		if (f == "") {
+		if (check != 1) {
 			$('#empty').append("</br><div align='center'>No events at this time</div><a href='#friday' data-role='button' data-theme='b'>Schedule</a>").trigger('create');
 		}
 		pass = pass.slice(0,pass.length-1);
@@ -378,7 +381,8 @@
 	}
 	
 	function toMap(pass) {
-		location.href = "map6.html?ID=" + pass;
+		 $.mobile.changePage('#mapPage', {
+         });
 	}
 	
 	function showResultsFriday(results1) {
@@ -1159,7 +1163,7 @@
 	</div>
 	<div data-role="content">	
 		<p>Olympia Arts Walk Mobile Guide</p>
-		<p>v1.0.0, September 2012</p>
+		<p>v1.1.0, September 2012</p>
 		<p>Developed by Esri&reg; for the City of Olympia, WA</p>
 	</div>
 </div>
