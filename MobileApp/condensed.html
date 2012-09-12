@@ -26,7 +26,7 @@
     
     .center-wrapper {
         text-align: center;
-        width: 200px;
+        width: 210px;
         margin:0 auto;
     }
     @-webkit-keyframes pulse {
@@ -383,6 +383,7 @@
 	function toMap(pass) {
 		 $.mobile.changePage('#mapPage', {
          });
+         zoomToLocation(pass);
 	}
 	
 	function showResultsFriday(results1) {
@@ -597,10 +598,12 @@
 
 			//add a graphics  layer to display selected features 
 			selectionLayer = new esri.layers.GraphicsLayer();
+            dojo.connect(selectionLayer,'onClick',function(evt){
+                viewVenues(evt.graphic);
+            });
 			var selR = createRenderer('blue');
 			selectionLayer.setRenderer(selR);
 			map.addLayer(selectionLayer);
-			map.reorderLayer(selectionLayer,2);
 			//map.addLayers([artsWalk, selectionLayer]);
             console.log("1");
 			//zoomToLocation(ID);
@@ -618,7 +621,6 @@
         }
         template = new esri.dijit.PopupTemplate(templateJson); //only used if a pop-up is desired
 
-
         artsWalk = new esri.layers.FeatureLayer("http://services.arcgis.com/a83cWFJpXhezKJzd/ArcGIS/rest/services/NewBestArtsWalkFall12/FeatureServer/0", {
           "id":'artsWalkLayer',
           mode: esri.layers.FeatureLayer.MODE_SNAPSHOT,
@@ -631,9 +633,7 @@
           viewVenues(evt.graphic);
         });
         //listen for the graphics layer click event 
-        dojo.connect(selectionLayer,'onClick',function(evt){
-          viewVenues(evt.graphic);
-        });
+
         console.log('35');
         map.infoWindow.resize(200, 250);
 
@@ -792,13 +792,13 @@
                   //zoom to extent of all graphics 
                   if(featureSet.features.length === 1){
                     //only one so centerAt
-                    esri.config.defaults.map.panDuration = 0;
+                    //esri.config.defaults.map.panDuration = 0;
                     map.centerAt(featureSet.features[0].geometry);
-                    esri.config.defaults.map.panDuration = 350;
+                    //esri.config.defaults.map.panDuration = 350;
 					//map.centerAndZoom(featureSet.features[0].geometry, 1);
                   }else{
                     var extent = esri.graphicsExtent(featureSet.features);
-                    map.setExtent(extent); //This doesn't seem to set the scale properly.
+                    map.setExtent(extent, true); //This doesn't seem to set the scale properly.
                   }
               });
         }
@@ -897,7 +897,7 @@
 		});*/
         $('.mapPage').live('pageshow',function(e) {
             console.log(map.extent);
-            resizeMap();
+            //resizeMap();
             params = $(e.target).jqmData("params");
             console.log(params);
             if(params != undefined) {
@@ -909,7 +909,7 @@
       });
 		$('.mapVenue').live('click',function(e) {
             console.log(map.extent);
-            resizeMap();
+            //resizeMap();
             //params = $('.mapVenue').data("params");
             //params = $(e.target).jqmData("params");
             console.log(params);
