@@ -598,6 +598,8 @@
 			var selR = createRenderer('blue');
 			selectionLayer.setRenderer(selR);
 			map.addLayer(selectionLayer);
+			map.reorderLayer(selectionLayer,2);
+			//map.addLayers([artsWalk, selectionLayer]);
             console.log("1");
 			//zoomToLocation(ID);
             console.log("2");
@@ -775,11 +777,15 @@
               var query = new esri.tasks.Query();
               query.where=('ID in (' + features + ')' );
              // query.objectIds = [features];
-             //selectionLayer.clear();
-              artsWalk.queryFeatures(query,function(featureSet){
+              selectionLayer.clear();
+              var graphic;
+			  artsWalk.queryFeatures(query,function(featureSet){
+				//var theSym = new esri.symbol.SimpleMarkerSymbol();
                 dojo.forEach(featureSet.features,function(feature){
                    //add the selected features to the selection layer 
-                   selectionLayer.add(feature);
+				   //feature.setSymbol(theSym);
+                   graphic = new esri.Graphic(feature.geometry, null, feature.attributes);
+				   selectionLayer.add(graphic);
                 });
                   //zoom to extent of all graphics 
                   if(featureSet.features.length === 1){
