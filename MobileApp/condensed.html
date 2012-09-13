@@ -14,7 +14,12 @@
 	<link rel="stylesheet" href="http://code.jquery.com/mobile/1.1.1/jquery.mobile.structure-1.1.1.min.css" />
 	<script src="http://code.jquery.com/jquery-1.7.1.min.js"></script>
 	<script src="http://code.jquery.com/mobile/1.1.1/jquery.mobile-1.1.1.min.js"></script>
-	<script type="text/javascript">var djConfig = {parseOnLoad: true};$.mobile.pushStateEnabled = false;$.mobile.ajaxEnabled = true</script>
+	<script type="text/javascript">
+		var djConfig = {parseOnLoad: true};
+		$.mobile.pushStateEnabled = false;
+		$.mobile.ajaxEnabled = true
+	</script>
+	<script type="text/javascript" src="js/config.js"></script>
 	<script type="text/javascript" src="http://serverapi.arcgisonline.com/jsapi/arcgis/?v=3.1compact"></script>
 	<script src="images64.js"></script>
 
@@ -91,7 +96,7 @@
     
 	var queryTaskEvents, queryEvents, query2, map, artsWalk, selectionLayer, template, params, queryTaskArtists, queryTaskVenues, queryVenues, queryName, queryArtists;
 	var pass = "";
-    
+	
 	function init() {
 		var supportsOrientationChange = "onorientationchange" in window,
           orientationEvent = supportsOrientationChange ? "orientationchange" : "resize";
@@ -100,11 +105,15 @@
           orientationChanged();
         }, false);
 	
+		dojo.byId("appTitle").innerHTML = userConfig.ApplicationName;
+		dojo.byId("mapPageTitle").innerHTML = userConfig.ApplicationName;
+		dojo.byId("aboutTitle").innerHTML = userConfig.ApplicationName;
+	
 	
         $.mobile.showPageLoadingMsg();
         initMap(0);
 		//query businesses
-        queryTaskVenues = new esri.tasks.QueryTask("http://services.arcgis.com/a83cWFJpXhezKJzd/ArcGIS/rest/services/NewBestArtsWalkFall12/FeatureServer/0");
+        queryTaskVenues = new esri.tasks.QueryTask(userConfig.LocationsLayer);
         //build query filter
         queryVenues = new esri.tasks.Query();
         queryVenues.returnGeometry = false;
@@ -114,7 +123,7 @@
 		
 		
 		//query artists
-		queryTaskArtists = new esri.tasks.QueryTask("http://services.arcgis.com/a83cWFJpXhezKJzd/ArcGIS/rest/services/NewBestArtsWalkFall12/FeatureServer/1");
+		queryTaskArtists = new esri.tasks.QueryTask(userConfig.PeopleLayer);
 		//build query filter, artist table
         queryArtists = new esri.tasks.Query();
         queryArtists.returnGeometry = false;
@@ -130,7 +139,7 @@
 		
         console.log("121");
 		//query events
-		queryTaskEvents = new esri.tasks.QueryTask("http://services.arcgis.com/a83cWFJpXhezKJzd/ArcGIS/rest/services/NewBestArtsWalkFall12/FeatureServer/2");
+		queryTaskEvents = new esri.tasks.QueryTask(userConfig.ActivityLayer);
 		//build query filter
         queryEvents = new esri.tasks.Query();
         queryEvents.returnGeometry = false;
@@ -592,10 +601,12 @@
           "scale": 1128.497176
         }];
 
+		var zoomExtent = userConfig.DefaultExtent.split(",");
+        var startExtent = new esri.geometry.Extent(parseFloat(zoomExtent[0]), parseFloat(zoomExtent[1]), parseFloat(zoomExtent[2]), parseFloat(zoomExtent[3]), new esri.SpatialReference({ wkid: userConfig.SpatialReference }));
 
         map = new esri.Map("map", {
           lods: lods,
-		  extent: new esri.geometry.Extent(-13682050, 5948629, -13679940, 5950043, new esri.SpatialReference({ wkid: 102100 }))
+		  extent: startExtent
         });
 
         console.log("-1");
@@ -762,6 +773,8 @@
         switch (error.code) {
         case error.PERMISSION_DENIED:
         console.log("Location not provided");
+		var zoomExtent = responseObject.DefaultExtent.split(",");
+
         var extent = new esri.geometry.Extent(-13682050, 5948629, -13679940, 5950043, new esri.SpatialReference({ wkid: 102100 }));
         map.setExtent(extent);
         $.mobile.hidePageLoadingMsg();
@@ -1167,7 +1180,7 @@
 <div data-role="page" id="index" data-theme="d">
 	<div data-role="header" data-theme="b">
 		<div>
-			<h4>Olympia Arts Walk</h4>
+			<h4 id="appTitle"></h4>
 		</div>
 	</div>
 	<div data-role="content" data-theme="d">	
@@ -1185,7 +1198,7 @@
 
 <div data-role="page" id="about">
 	<div data-role="header">
-		<h1>Olympia Arts Walk</h1>
+		<h1 id="aboutTitle"></h1>
 	</div>
 	<div data-role="content">	
 		<p>Olympia Arts Walk Mobile Guide</p>
@@ -1241,7 +1254,7 @@
 
 <div data-role="page" id='mapPage' style="width:100%;height:100%;overflow:hidden;" data-theme="b"> <!--the 'data-' attributes are additional functionality added by jquery mobile-->
 	<div id="header" data-role="header" data-theme='b'>
-		<h1>Olympia Arts Walk</h1>
+		<h1 id="mapPageTitle"></h1>
 		<a href="#index" data-rel="back" data-theme="b" data-icon="back" data-transition="slide" data-type="button" data-inline="true">Back</a>
 		<a href="#index" data-theme="b" data-icon="home" data-transition="pop" data-direction="reverse" data-type="button" data-inline="true" data-iconpos='notext'></a>
 		<a onclick='showLocation()' id='geolocation' style='right: 40px; float: right; position: absolute; display: inline;' data-theme='b' data-transition='fade' data-ajax='false' data-icon='geolocation' data-iconpos='notext' data-inline="true"></a>
