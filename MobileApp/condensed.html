@@ -94,7 +94,7 @@
 	dojo.require("esri.arcgis.utils");
 	dojo.require("esri.tasks.query");
     
-	var queryTaskEvents, queryEvents, query2, map, artsWalk, selectionLayer, template, params, queryTaskArtists, queryTaskVenues, queryVenues, queryName, queryArtists;
+	var queryTaskEvents, queryEvents, query2, map, artsWalk, selectionLayer, template, parameters, queryTaskArtists, queryTaskVenues, queryVenues, queryName, queryArtists;
 	var pass = "";
 	
 	function init() {
@@ -832,16 +832,13 @@
       }
 	  
 	  function jQueryReady() {
-        $('#mapPage').live('pageshow', function (event, ui) {
-          resizeMap();
-        });
 		$('.artistVenue').live('vclick',
 			function(e) {
 				
 				//params = $(e.target).jqmData("params");
-                params = $('.artistVenue').data("params")
-				console.log(params);
-				var paramsObj = dojo.queryToObject(params);
+                parameters = $('.artistVenue').data("params")
+				console.log(parameters);
+				var paramsObj = dojo.queryToObject(parameters);
 				var queryEventsVenue = new esri.tasks.Query();
 				queryEventsVenue.returnGeometry = false;
 				queryEventsVenue.outFields = ["Time, Day, Event"];
@@ -865,10 +862,10 @@
         $('.venue').live('vclick',
 			function(e) {
 				
-				params = $(e.target).jqmData("params");
+				parameters = $(e.target).jqmData("params");
                 //params = $('.venue').data("params")
-				console.log(params);
-				var paramsObj = dojo.queryToObject(params);
+				console.log(parameters);
+				var paramsObj = dojo.queryToObject(parameters);
 				var queryEventsVenue = new esri.tasks.Query();
 				queryEventsVenue.returnGeometry = false;
 				queryEventsVenue.outFields = ["Time, Day, Event"];
@@ -906,8 +903,8 @@
 		);*/
 		$('.artist').live('vclick',
 			function(e) {
-				params = $(e.target).jqmData("params");
-				var paramsObj = dojo.queryToObject(params);
+				parameters = $(e.target).jqmData("params");
+				var paramsObj = dojo.queryToObject(parameters);
 				artistName(paramsObj);
 				console.log(paramsObj);
 				//run some javascript based on the params to select features on map and zoom
@@ -920,31 +917,34 @@
 		$('#searchartist').bind('pageshow',function() {
             $('#myList').listview('refresh');
 		});*/
-        $('.mapPage').live('click',function(e) {
+        $('#mapPage').live('pageshow',function(e) {
             console.log(map.extent);
-            //resizeMap();
-            params = $(e.target).jqmData("params");
-            console.log(params);
-            if(params != undefined) {
-                var paramsObj = dojo.queryToObject(params);
+            resizeMap();
+            parameters = $('.mapPage').jqmData("params");
+            console.log(parameters);
+            if(parameters != undefined) {
+                var paramsObj = dojo.queryToObject(parameters);
                 zoomToLocation(paramsObj);
             } else {
                 showLocation();
             }
         });
-		$('.mapVenue').live('click',function(e) {
+		$('#mapVenue').live('pageshow',function(e) {
             console.log(map.extent);
-            //resizeMap();
+            resizeMap()
             //params = $('.mapVenue').data("params");
             //params = $(e.target).jqmData("params");
-            console.log(params);
-            if(params != undefined) {
-                var paramsObj = dojo.queryToObject(params);
+            console.log(parameters);
+            if(parameters != undefined) {
+                var paramsObj = dojo.queryToObject(parameters);
                 zoomToLocation(paramsObj.ID);
             } else {
                 showLocation();
             }
-      });
+        });
+      /*$('#mapPage').live('pageshow', function (event, ui) {
+          resizeMap();
+        });*/
     }
       function showLocation() {
         console.log(navigator.geolocation);
@@ -1069,7 +1069,7 @@
 				$('#website').append("<a href='" + site + "' data-role='button' data-theme='b'>Venue website</a>").trigger('create');
 			}*/
 			$('#onmap').append('<a href="#mapPage" data-params="ID=' + results1.features[0].attributes["ID"] + '" data-role="button" data-theme="b" data-transition="pop" class="mapVenue">Map</a>').trigger('create');
-            params = "ID=" + results1.features[0].attributes["ID"];
+            parameters = "ID=" + results1.features[0].attributes["ID"];
 		}
 		
 		function showEvents(results2) {
