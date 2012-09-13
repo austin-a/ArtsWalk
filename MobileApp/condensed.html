@@ -907,7 +907,7 @@
 		$('#searchartist').bind('pageshow',function() {
             $('#myList').listview('refresh');
 		});*/
-        $('.mapPage').live('pageshow',function(e) {
+        $('.mapPage').live('click',function(e) {
             console.log(map.extent);
             //resizeMap();
             params = $(e.target).jqmData("params");
@@ -1171,7 +1171,7 @@
 		</div>
 	</div>
 	<div data-role="content" data-theme="d">	
-		Welcome! This app will function as your virtual guide while you visit Arts Walk. You can find businesses, artists, and events using the buttons below.
+		Welcome! This app will function as your virtual guide while you visit Arts Walk. You can find businesses, artists, and events using the buttons below. Information subject to change.
 		<a href="#searchvenue" id="venuebtn" data-role="button" data-icon="search" data-theme="b" data-transition="slide" class="ui-disabled">Search by venue</a>
 		<a href="#searchartist" id="artistbtn" data-role="button" data-icon="search" data-theme="b" data-transition="slide" class="ui-disabled">Search artists and events</a>
 		<a href="#mapPage" id="mapbtn" data-role="button" data-icon="star" data-theme="b" data-transition="pop" class="mapPage ui-disabled">Find on map</a>
