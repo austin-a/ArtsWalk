@@ -802,7 +802,7 @@
 		  }else{
             //url parameter with one or more id 
               var query = new esri.tasks.Query();
-              query.where=('ID in (' + features + ')' );
+              query.where=('ID in (' + features.ID + ')' );
              // query.objectIds = [features];
               selectionLayer.clear();
               var graphic;
@@ -920,7 +920,7 @@
         $('#mapPage').live('pageshow',function(e) {
             console.log(map.extent);
             resizeMap();
-            parameters = $('.mapPage').jqmData("params");
+            //parameters = $(e.target).jqmData("params");
             console.log(parameters);
             if(parameters != undefined) {
                 var paramsObj = dojo.queryToObject(parameters);
@@ -929,18 +929,10 @@
                 showLocation();
             }
         });
-		$('#mapVenue').live('pageshow',function(e) {
-            console.log(map.extent);
+		$('.mapPage').live('click',function(e) {
+            parameters = "";
             resizeMap()
-            //params = $('.mapVenue').data("params");
-            //params = $(e.target).jqmData("params");
-            console.log(parameters);
-            if(parameters != undefined) {
-                var paramsObj = dojo.queryToObject(parameters);
-                zoomToLocation(paramsObj.ID);
-            } else {
-                showLocation();
-            }
+            showLocation();
         });
       /*$('#mapPage').live('pageshow', function (event, ui) {
           resizeMap();
@@ -1163,7 +1155,7 @@
 		function showArtist(results3) {
 			$('#artistVenue').empty()
 			var b = "";
-			$('#artistVenue').append("<li data-role='list-divider'>Art on display</li>");
+			$('#artistVenue').append("<li data-role='list-divider'>Presenting Artists</li>");
 			for (var i = 0, il = results3.features.length; i < il; i++) { //iterate through all of the events
 				var featureAttributes = results3.features[i].attributes;
 				$('#artistVenue').append("<li><a href='#artist' data-params='ID=" + featureAttributes["ID"] + "&Artist=" + featureAttributes["Artist"] + "' data-role='button' data-transition='slide' class='artist'>" + featureAttributes["Artist"] + "</a></li>");
