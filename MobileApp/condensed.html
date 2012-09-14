@@ -95,7 +95,9 @@
 	dojo.require("esri.tasks.query");
     
 	var queryTaskEvents, queryEvents, query2, map, artsWalk, selectionLayer, template, parameters, queryTaskArtists, queryTaskVenues, queryVenues, queryName, queryArtists;
+    var flag = 0;
 	var pass = "";
+    var shownOnce = false;
 	
 	function init() {
 		var supportsOrientationChange = "onorientationchange" in window,
@@ -387,13 +389,18 @@
 		if (check != 1) {
 			$('#empty').append("</br><div align='center'>No events at this time</div><a href='#friday' data-role='button' data-theme='b'>Schedule</a>").trigger('create');
 		}
-		pass = pass.slice(0,pass.length-1);
+		pass = "ID=" + pass.slice(0,pass.length-1);
 		//$('#onmap').append('<a href="#mapPage" data-params="ID=' + pass + '" data-role="button" data-theme="b" data-inline="true" class="map">Map</a>').trigger('create');
 	}
 	
 	function toMap(pass) {
 		 $.mobile.changePage('#mapPage', {
          });
+         console.log(pass);
+         if (!isNaN(map.extent.xmin) && shownOnce == false) {
+                shownOnce = true;
+                resizeMap();
+        }
          zoomToLocation(pass);
 	}
 	
@@ -832,7 +839,7 @@
       }
 	  
 	  function jQueryReady() {
-		$('.artistVenue').live('vclick',
+		$('.artistVenue').live('click',
 			function(e) {
 				
 				//params = $(e.target).jqmData("params");
@@ -859,7 +866,7 @@
 				//query to retrieve other necessary data such as website based on venue ID
 			}
 		);
-        $('.venue').live('vclick',
+        $('.venue').live('click',
 			function(e) {
 				
 				parameters = $(e.target).jqmData("params");
@@ -901,7 +908,7 @@
 				//run some javascript based on the params to select features on map and zoom
 			}
 		);*/
-		$('.artist').live('vclick',
+		$('.artist').live('click',
 			function(e) {
 				parameters = $(e.target).jqmData("params");
 				var paramsObj = dojo.queryToObject(parameters);
@@ -920,19 +927,33 @@
         $('#mapPage').live('pageshow',function(e) {
             console.log(map.extent);
             //parameters = $(e.target).jqmData("params");
-            resizeMap();
-            console.log(parameters);
-            if(parameters != undefined) {
-                var paramsObj = dojo.queryToObject(parameters);
-                //zoomToLocation(paramsObj);
-            } else {
-                showLocation();
+            if (!isNaN(map.extent.xmin) && shownOnce == false) {
+                shownOnce = true;
+                resizeMap();
             }
+            if(flag == 0) {
+                if(parameters != undefined) {
+                    var paramsObj = dojo.queryToObject(parameters);
+                    zoomToLocation(paramsObj);
+                } else {
+                    showLocation();
+                }
+            }
+            flag = 0;
+        });
+        $('.mapPage').live('click',function(e) {
+            flag = 1;
+            showLocation();
         });
 		$('.mapVenue').live('click',function(e) {
             //params = $('.mapVenue').data("params");
             parameters = $('.mapVenue').jqmData("params");
             console.log(parameters);
+        });
+        $('.multiPass').live('click',function(e) {
+            flag = 1;
+            var pass2 = dojo.queryToObject(pass);
+            zoomToLocation(pass2);
         });
       /*$('#mapPage').live('pageshow', function (event, ui) {
           resizeMap();
@@ -959,19 +980,19 @@
 		map.graphics.clear();
         var symbol = new esri.symbol.PictureMarkerSymbol("here.png", 35, 35);
         map.graphics.add(new esri.Graphic(pt, symbol));
-        map.centerAndZoom(pt,1);
+        map.centerAndZoom(pt,3);
         $.mobile.hidePageLoadingMsg();
       }
 
       function orientationChanged() {
         if (map) {
-			map.reposition();
-			map.resize();
+			//map.reposition();
+			//map.resize();
+            resizeMap();
         }
       }
 
       function resizeMap() {
-        //var time1, time2;
         if (map) {
           //get header height and subtract from screen height
           var ht = dojo.window.getBox().h-dojo.position(dojo.byId('header')).h;
@@ -985,19 +1006,7 @@
 			map.resize();
          console.log('The map has been resized!');
         }
-        //time1 = 
       }
-    
-    function timer() { //returns current time
-        var start = new Date().getTime(),  
-        elapsed = '0.0';  
-        window.setInterval(function()  {  
-            var time = new Date().getTime() - start;  
-            elapsed = Math.floor(time / 100) / 10;  
-            if(Math.round(elapsed) == elapsed) { elapsed += '.0'; }
-            return elapsed;
-        }, 100);
-    }
     
       function updateLayerVisibility() {
         //toggle layer visibility 
@@ -1207,7 +1216,7 @@
 	</div>
 	<div data-role="content">	
 		<p>Olympia Arts Walk Mobile Guide</p>
-		<p>v1.2.0, September 2012</p>
+		<p>v1.2.1, September 2012</p>
 		<p>Developed by Esri&reg; for the City of Olympia, WA</p>
 	</div>
 </div>
@@ -1217,7 +1226,7 @@
 		<h1>Happening Now</h1>
 		<a href="#index" data-rel="back" data-theme="b" data-icon="back" data-transition="slide" data-type="button" data-inline="true">Back</a>
 		<a href="#index" data-theme="b" data-icon="home" data-transition="slide" data-direction="reverse" data-type="button" data-inline="true" data-iconpos='notext'></a>
-		<a onclick="toMap(pass)" style="right: 40px; float: right; top: 3px; position: absolute; display: inline;" data-theme="b" data-ajax="false" data-inline="true">Map</a>
+		<a href="#mapPage" style="right: 40px; float: right; top: 3px; position: absolute; display: inline;" data-theme="b" data-ajax="false" class="multiPass" data-inline="true">Map</a>
 	</div>
 	<div data-role="content">
 		<ul data-role="listview" id="now" data-divider-theme="b"></ul>
