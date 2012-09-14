@@ -919,20 +919,20 @@
 		});*/
         $('#mapPage').live('pageshow',function(e) {
             console.log(map.extent);
-            resizeMap();
             //parameters = $(e.target).jqmData("params");
+            resizeMap();
             console.log(parameters);
             if(parameters != undefined) {
                 var paramsObj = dojo.queryToObject(parameters);
-                zoomToLocation(paramsObj);
+                //zoomToLocation(paramsObj);
             } else {
                 showLocation();
             }
         });
-		$('.mapPage').live('click',function(e) {
-            parameters = "";
-            resizeMap()
-            showLocation();
+		$('.mapVenue').live('click',function(e) {
+            //params = $('.mapVenue').data("params");
+            parameters = $('.mapVenue').jqmData("params");
+            console.log(parameters);
         });
       /*$('#mapPage').live('pageshow', function (event, ui) {
           resizeMap();
@@ -971,6 +971,7 @@
       }
 
       function resizeMap() {
+        //var time1, time2;
         if (map) {
           //get header height and subtract from screen height
           var ht = dojo.window.getBox().h-dojo.position(dojo.byId('header')).h;
@@ -984,8 +985,20 @@
 			map.resize();
          console.log('The map has been resized!');
         }
+        //time1 = 
       }
-
+    
+    function timer() { //returns current time
+        var start = new Date().getTime(),  
+        elapsed = '0.0';  
+        window.setInterval(function()  {  
+            var time = new Date().getTime() - start;  
+            elapsed = Math.floor(time / 100) / 10;  
+            if(Math.round(elapsed) == elapsed) { elapsed += '.0'; }
+            return elapsed;
+        }, 100);
+    }
+    
       function updateLayerVisibility() {
         //toggle layer visibility 
         var inputs = dojo.query(".custom");
@@ -1061,7 +1074,7 @@
 				$('#website').append("<a href='" + site + "' data-role='button' data-theme='b'>Venue website</a>").trigger('create');
 			}*/
 			$('#onmap').append('<a href="#mapPage" data-params="ID=' + results1.features[0].attributes["ID"] + '" data-role="button" data-theme="b" data-transition="pop" class="mapVenue">Map</a>').trigger('create');
-            parameters = "ID=" + results1.features[0].attributes["ID"];
+            //parameters = "ID=" + results1.features[0].attributes["ID"];
 		}
 		
 		function showEvents(results2) {
