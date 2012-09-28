@@ -976,6 +976,11 @@
             parameters = $('.mapVenue').jqmData("params");
             console.log(parameters);
         });
+		$('.mapVenue1').live('click',function(e) {
+            //params = $('.mapVenue').data("params");
+            parameters = $('.mapVenue1').jqmData("params");
+            console.log(parameters);
+        });
         $('.multiPass').live('click',function(e) {
             flag = 1;
             var pass2 = dojo.queryToObject(pass);
@@ -1204,7 +1209,7 @@
 			$('#artistLocation').empty();
 			$('#artistMap').empty();
 			$('#artistLocation').append("<a href='#venue' data-params='ID=" + results1.features[0].attributes["ID"] + "&Business=" + results1.features[0].attributes["Business"] + "' data-role='button' data-theme='b' data-transition='fade' class='artistVenue'>" + results1.features[0].attributes["Business"] + "</a>").trigger('create'); //this code passes the business name as well as the ID
-			$('#artistMap').append('<a href="#mapPage" data-params="ID=' + results1.features[0].attributes["ID"] + '" data-role="button" data-theme="b" data-transition="pop" class="mapVenue">Map</a>').trigger('create');
+			$('#artistMap').append('<a href="#mapPage" data-params="ID=' + results1.features[0].attributes["ID"] + '" data-role="button" data-theme="b" data-transition="pop" class="mapVenue1">Map</a>').trigger('create');
 		}
 		
 		function showArtist(results3) {
@@ -1239,7 +1244,8 @@
 		<a href="#searchartist" id="artistbtn" data-role="button" data-icon="search" data-theme="b" data-transition="slide" class="ui-disabled">Search artists and events</a>
 	</div>
 	<div data-role="footer" class="footer-docs" data-theme="d">
-		<div class="right"><a href="#about" data-role="button" data-mini="true" data-inline="true" data-rel="dialog" data-ajax="true" data-transition="pop" data-theme="b">About</a></div>
+		<div class="right"><a href="#about" data-role="button" data-mini="true" data-inline="true" data-rel="dialog" data-ajax="true" data-transition="pop" data-theme="b">About</a>
+		<a style='right: 0px; float: right; position: absolute; display: inline;' href="https://www.surveymonkey.com/s/ArtsWalkMobileAppFeedback" data-role="button" data-mini="true" data-inline="true" data-ajax="true" data-transition="pop" data-theme="b">Feedback</a></div>
 	</div>
 </div>
 
