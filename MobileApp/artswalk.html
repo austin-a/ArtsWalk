@@ -312,7 +312,7 @@
 			} else {
 				theStartEnd3 = theStartEnd[0].split(":");
 			}
-			theFinalStartEnd.push([theStartEnd2, theStartEnd3])
+			//theFinalStartEnd.push([theStartEnd2, theStartEnd3])
 			if (parseInt(theStartEnd2[0]) < parseInt(theStartEnd3[0])) {
 				theStartEndNums[0] = theStartEndNums[0] + " " + theStartEndNums[1].split(" ")[1];
 			} else if (parseInt(theStartEnd2[0]) > parseInt(theStartEnd3[0])) {
@@ -324,7 +324,7 @@
 			if (dayarray[day] == events.features[i].attributes["Day"] && dojo.string.trim(events.features[i].attributes["Time"]) != "Various Times") {
 				var startDayTime = Date.parse(dayString + " " + theStartEndNums[0].replace("12 PM","12:00").replace("12:10 PM", "12:10"));
 				var endDayTime = Date.parse(dayString + " " + theStartEndNums[1].replace("12 PM","12:00").replace("12:10 PM", "12:10"));
-				console.log(startDayTime + " AND " + endDayTime);
+				//console.log(startDayTime + " AND " + endDayTime);
 				if ((Date.parse("now") >= startDayTime.setHours(startDayTime.getHours() - 1)) && (Date.parse("now") <= endDayTime.setHours(endDayTime.getHours() + 1))) {
 					f = "<li><a href='#venue' data-params='ID=" + events.features[i].attributes["ID"] + "' data-transition='slide' class='venue'>" + featureAttributes["Time"] + " ";
 					pass = pass + events.features[i].attributes["ID"] + ",";
@@ -357,7 +357,7 @@
 		//$('#now').listview();
 		//$('#now').listview('refresh');
 		}
-		console.log(theFinalStartEnd);
+		//console.log(theFinalStartEnd);
 		if (check != 1) {
 			$('#empty').append("</br><div align='center'>No events at this time</div><a href='#friday' data-role='button' data-theme='b'>Schedule</a>").trigger('create');
 		}
