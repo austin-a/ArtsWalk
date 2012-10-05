@@ -284,6 +284,7 @@
 		var c = 0;
 		var s = 0;
 		var f, eventtime, check;
+		check = 0;
 		var dayarray = new Array ("Sunday","Monday","Tuesday","Wednesday","Thursday","Friday","Saturday");
 		var sooner = time - 1;
 		var later = time + 1;
@@ -329,6 +330,7 @@
 					pass = pass + events.features[i].attributes["ID"] + ",";
 					f = f + featureAttributes["Event"] + "</a></li>";
 					$('#now').append(f);
+					check = 1;
 				}
 			}
 		  if ((events.features[i].attributes["Time"] == "Ongoing" || dojo.string.trim(events.features[i].attributes["Time"]) == "Various Times") && dayarray[day] == events.features[i].attributes["Day"]) {
