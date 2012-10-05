@@ -23,6 +23,7 @@
 	<script type="text/javascript" src="js/config.js"></script>
 	<script type="text/javascript" src="http://serverapi.arcgisonline.com/jsapi/arcgis/?v=3.2compact"></script>
 	<script type="text/javascript" src="js/images64.js"></script>
+	<script type="text/javascript" src="js/date.js"></script>
 
 
 <style type="text/css">
@@ -276,8 +277,8 @@
 		var time = getTheTime();
 		//use these to test the program and set the day and time.
 		//var time = 12;
-		//var day = getTheDay();
-		var day = 6;
+		var day = getTheDay();
+		//var day = 6;
 		var u = 0;
 		var l = 0;
 		var c = 0;
@@ -286,97 +287,51 @@
 		var dayarray = new Array ("Sunday","Monday","Tuesday","Wednesday","Thursday","Friday","Saturday");
 		var sooner = time - 1;
 		var later = time + 1;
+		var theFinalStartEnd = [];
+		var dayString = "";
+		if (dayarray[day] == "Friday") {
+			dayString = "10/5/2012";
+		}
+		if (dayarray[day] == "Saturday") {
+			dayString = "10/6/2012";
+		}
 		for (var i=0, il=events.features.length; i<il; i++) {
+			
 			var next = "";
 			var featureAttributes = events.features[i].attributes;
-			if (dayarray[day] == events.features[i].attributes["Day"]) {
-				//Begin copied code
-				while (next="" || s < 150) {
-					second = events.features[i].attributes["Time"].charAt(s);
-					if (second == "-") {
-						if (isNaN(parseInt(events.features[i].attributes["Time"].charAt(s+2)))) {
-							next="next";
-							second = events.features[i].attributes["Time"].charAt(s+1);
-						}
-						else {
-							next="next";
-							second = events.features[i].attributes["Time"].charAt(s+1) + events.features[i].attributes["Time"].charAt(s+2);
-						}
-					}
-					s++;
-				}
-				if (s == 150) {
-					second = events.features[i].attributes["Time"].charAt(0);
-				}
-				var one = events.features[i].attributes["Time"].charAt(0);
-				var two = events.features[i].attributes["Time"].charAt(1);
-				if (one == 1) {
-					if (isNaN(parseInt(two, 10))) {
-						//Insert new code here for when the second number is NaN.
-						for (att in featureAttributes) {
-							if (att != "Day" && att != "ID") {
-								if (time-1 <= second && time+1 >= one) {
-								//if (sooner <= one && later >= one) {
-									if (u < 1) {
-										f = "<li><a href='#venue' data-params='ID=" + events.features[i].attributes["ID"] + "' data-transition='slide' class='venue'>" + featureAttributes[att] + " ";
-										pass = pass + events.features[i].attributes["ID"] + ",";
-										u++;
-									}
-									else {
-										f = f + featureAttributes[att] + "</a></li>";
-										u = 0;
-									}
-								}
-							}
-						}
-					}
-					else {
-						//Insert code here for when there is a second number.
-						var both = one + two;
-						if (s == 150) {
-							second = both;
-						}
-						for (att in featureAttributes) {
-							if (att != "Day" && att != "ID") {
-								if (time-1 <= second && time+1 >= both) {
-									if (u < 1) {
-										f = "<li><a href='#venue' data-params='ID=" + events.features[i].attributes["ID"] + "' class='venue'>" + featureAttributes[att] + " ";
-										pass = pass + events.features[i].attributes["ID"] + ",";
-										console.log(this.pass);
-										u++;
-									}
-									else {
-										f = f + featureAttributes[att] + "</a></li>";
-										u = 0;
-									}
-								}
-							}
-						}
-					}	
-					$('#now').append(f);
-                    check = 1;
-				}
-				//End of copied code
-				else if (time-1 <= second && time+1 >= one) {
-					for (att in featureAttributes) {
-						if (att != "Day" && att != "ID") {
-							if (u < 1) {
-								f = "<li><a href='#venue' data-params='ID=" + events.features[i].attributes["ID"] + "' data-transition='slide' class='venue'>" + featureAttributes[att] + " ";
-								pass = pass + events.features[i].attributes["ID"] + ",";
-								u++;
-							}
-							else {
-								f = f + featureAttributes[att] + "</a></li>";
-								u = 0;
-							}
-						}
-					}
-					$('#now').append(f);
-                    check = 1;
-				}
-			
+			var theStartEndNums = dojo.string.trim(events.features[i].attributes["Time"]).replace("am"," AM").replace("pm"," PM").split("-");
+			if (theStartEndNums.length == 1) {
+				theStartEndNums[1] = theStartEndNums[0];
 			}
-		  if (events.features[i].attributes["Time"] == "Ongoing" || events.features[i].attributes["Time"] == "Various times") {
+			var theStartEnd = dojo.string.trim(events.features[i].attributes["Time"]).replace("am","").replace("pm","").split("-");
+			var theStartEnd2 = theStartEnd[0].split(":");
+			var theStartEnd3;
+			if (theStartEnd.length > 1) {
+				theStartEnd3 = theStartEnd[1].split(":");
+			} else {
+				theStartEnd3 = theStartEnd[0].split(":");
+			}
+			theFinalStartEnd.push([theStartEnd2, theStartEnd3])
+			if (parseInt(theStartEnd2[0]) < parseInt(theStartEnd3[0])) {
+				theStartEndNums[0] = theStartEndNums[0] + " " + theStartEndNums[1].split(" ")[1];
+			} else if (parseInt(theStartEnd2[0]) > parseInt(theStartEnd3[0])) {
+				theStartEndNums[0] = theStartEndNums[0] + " AM";
+			} else if (theStartEndNums[0].indexOf("PM") == -1 && theStartEndNums[0].indexOf("AM") == -1) {
+				theStartEndNums[0] = theStartEndNums[0] + " AM";
+			}
+			
+			if (dayarray[day] == events.features[i].attributes["Day"] && dojo.string.trim(events.features[i].attributes["Time"]) != "Various Times") {
+				var startDayTime = Date.parse(dayString + " " + theStartEndNums[0].replace("12 PM","12:00").replace("12:10 PM", "12:10"));
+				var endDayTime = Date.parse(dayString + " " + theStartEndNums[1].replace("12 PM","12:00").replace("12:10 PM", "12:10"));
+				console.log(startDayTime + " AND " + endDayTime);
+				if ((Date.parse("now") >= startDayTime.setHours(startDayTime.getHours() - 1)) && (Date.parse("now") <= endDayTime.setHours(endDayTime.getHours() + 1))) {
+					f = "<li><a href='#venue' data-params='ID=" + events.features[i].attributes["ID"] + "' data-transition='slide' class='venue'>" + featureAttributes["Time"] + " ";
+					pass = pass + events.features[i].attributes["ID"] + ",";
+					f = f + featureAttributes["Event"] + "</a></li>";
+					$('#now').append(f);
+				}
+			}
+		  if ((events.features[i].attributes["Time"] == "Ongoing" || dojo.string.trim(events.features[i].attributes["Time"]) == "Various Times") && dayarray[day] == events.features[i].attributes["Day"]) {
 			var count = 0;
 			for (att in featureAttributes) {
 				if (att != "Day" && att != "ID") {
@@ -400,6 +355,7 @@
 		//$('#now').listview();
 		//$('#now').listview('refresh');
 		}
+		console.log(theFinalStartEnd);
 		if (check != 1) {
 			$('#empty').append("</br><div align='center'>No events at this time</div><a href='#friday' data-role='button' data-theme='b'>Schedule</a>").trigger('create');
 		}
