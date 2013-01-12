@@ -110,7 +110,8 @@
 		dojo.byId("appTitle").innerHTML = userConfig.ApplicationName;
 		dojo.byId("mapPageTitle").innerHTML = userConfig.ApplicationName;
 		dojo.byId("aboutTitle").innerHTML = userConfig.ApplicationName;
-	
+		dojo.byId("introText").innerHTML = userConfig.ApplicationMessage;
+		dojo.byId("aboutText").innerHTML = userConfig.ApplicationAbout;
 	
         $.mobile.showPageLoadingMsg();
         initMap(0);
@@ -404,7 +405,7 @@
          zoomToLocation(pass);
 	}
 	
-	function showResultsFriday(results1) {
+	/*function showResultsFriday(results1) {
 		var u = 0;
 		var l = 0;
 		for (var i=0, il=results1.features.length; i<il; i++) { //iterate through all of the records
@@ -469,13 +470,115 @@
 			f = "";
 		  }
 	    }
-      }
+      }*/
 	  
-	  function getName() {
-		var business = esri.urlToObject(dojo.doc.location.href);
-		var b = business.query.event;
-		return b;
-	  }
+	  function showResultsFriday(results1) {	//If you need to add an additional day of events, simply copy this code and paste it below. The if statements that check for a day will need to be altered according to your data as well as the rest of the variables.
+
+		var u = 0;
+		var l = 0;
+		var c = 0;
+		for (var i=0, il=results1.features.length; i<il; i++) { //iterate through all of the records
+		  var featureAttributes = results1.features[i].attributes;
+		  if (results1.features[i].attributes["Day"] == "Friday") { //only get the events that occur on Friday
+			if (i == 0) {
+				l = 0;
+			}
+			else {
+				l = i - 1; //this is used to reference the previously occuring listing
+			}
+			if (results1.features[i].attributes["Time"].charAt(0) < 9) { //this filters out NaN values
+				var one = results1.features[i].attributes["Time"].charAt(0); //the first digit of the time (present record)
+				var two = results1.features[i].attributes["Time"].charAt(1); //the second digit of the time (present record)
+				var e = 0;
+				if (one == 1) { //this checks to see if the number has two digits (only times starting with 1 can have two digits)
+					if (isNaN(parseInt(two, 10))) { //checks to see if the second digit is a valid number, veryifying that the number has two digits. If true (is NaN), the time must be 1:00
+						var last = results1.features[l].attributes["Time"].charAt(0); //this gets the first digit of the time of the previous record
+						if (isNaN(parseInt(results1.features[l].attributes["Time"].charAt(1)))) { //this gets second digit of the of the previous record and checks to see if it is a valid number. If true, it is NaN and there is no second digit.
+						}
+						else {
+							last = last + results1.features[l].attributes["Time"].charAt(1); //the second digit must be valid in order to hit this statement, so both values are added together
+						}
+						if(one > last) { //now the resulting number is to compare against the time of the current record
+							$('#fridayEvents').append("<li data-role='list-divider'>" + results2.features[i].attributes["Time"].charAt(0) + ":00");
+						}
+						else if (last > one) {
+							$('#fridayEvents').append("<li data-role='list-divider'>1:00</li>"); //if the previous result happens to be greater then the present value, the present value must be 1:00
+						}
+					}
+					else { //if this point is hit, the present value must have two digits (because the second value is a valid number)
+						var r = 0;
+						var both = one + parseInt(two, 10);
+						//compare 'both' against the previous value
+						var last = results1.features[l].attributes["Time"].charAt(0); //grabs the first digit of the previous record
+						if (isNaN(parseInt(results1.features[l].attributes["Time"].charAt(1)))) { //checks to see if there is a second digit of the previous record. If it isn't a number, nothing special happens
+						}
+						else {
+							last = last + results1.features[l].attributes["Time"].charAt(1); //if the second digit is a valid number, it is appended to the first number
+						}
+						if (isNaN(parseInt(last, 10))) { //checks to see if the time of the previous record is a valid number
+							$('#fridayEvents').append("<li data-role='list-divider'>" + both + ":00");
+							r++;
+						}
+						if (r == 0) {
+							if (c == 0) {
+								$('#fridayEvents').append("<li data-role='list-divider'>" + both + ":00");
+							}
+							else {
+								if (results1.features[l].attributes["Time"].charAt(0) == 1 && results1.features[l].attributes["Time"].charAt(1) <= 2) {
+									last = results1.features[l].attributes["Time"].charAt(0) + results1.features[l].attributes["Time"].charAt(1);
+								}
+								if (both > last) {
+									$('#fridayEvents').append("<li data-role='list-divider'>" + both + ":00");
+								}
+								else if (last > both) {
+									$('#fridayEvents').append("<li data-role='list-divider'>1:00");
+								}
+							}
+						}
+					}	
+					e++;
+				}
+				if (e == 0) {
+					if (results1.features[i].attributes["Time"].charAt(0) > results1.features[l].attributes["Time"].charAt(0)) {
+						$('#fridayEvents').append("<li data-role='list-divider'>" + results1.features[i].attributes["Time"].charAt(0) + ":00");
+					}
+				}
+			}
+			var s = "";
+			  for (att in featureAttributes) {
+				if (att != "Day" && att != "ID") {
+					if (u < 1) {
+						s = s + "<li><a href='#venue' data-params='ID=" + results1.features[i].attributes["ID"] + "' data-transition='slide' class='venue'>" + featureAttributes[att] + " ";
+						u++;
+					}
+					else {
+						s = s + featureAttributes[att] + "</a></li>";
+						u = 0;
+					}
+				}
+			  }
+			  $('#fridayEvents').append(s);
+			  c++
+		  }
+		  else if (results1.features[i].attributes["Time"] == "Ongoing" || results1.features[i].attributes["Time"] == "Various times") {
+			for (att in featureAttributes) {
+				if (att != "Day" && att != "ID") {
+					if (u < 1) {
+						$('#fridayEvents').append(s + "<li>" + featureAttributes[att] + " ");
+						u++;
+					}
+					else {
+						$('#fridayEvents').append(featureAttributes[att] + "</li>");
+						u = 0;
+					}
+				}
+			  }
+		  }
+		  else {
+			s = "";
+		  }
+		}
+      }
 	  
 	  function showResultsSaturday(results2) {
 		var u = 0;
@@ -578,6 +681,12 @@
 		  }
 		}
       }
+	  
+	  function getName() {
+		var business = esri.urlToObject(dojo.doc.location.href);
+		var b = business.query.event;
+		return b;
+	  }
 	  
 	  function initMap(ID) {
         console.log('Map, launched!');
@@ -1197,8 +1306,8 @@
 			<h4 id="appTitle"></h4>
 		</div>
 	</div>
-	<div data-role="content" data-theme="d">	
-		Welcome! This app will function as your virtual guide while you visit Arts Walk. You can find businesses, artists, and events using the buttons below. Information subject to change.
+	<div data-role="content" data-theme="d">
+		<div id="introText"></div>
         <a href="#rightnow" id="nowbtn" data-role="button" data-icon="check" data-theme="b" data-transition="slide" class="ui-disabled">Happening now</a>		
         <a href="#mapPage" id="mapbtn" data-role="button" data-icon="star" data-theme="b" data-transition="pop" class="mapPage ui-disabled">Find on map</a>
 		<a href="#friday" id="schedulebtn" data-role="button" data-icon="info" data-theme="b" data-transition="slide" class="ui-disabled">Event schedule</a>
@@ -1214,10 +1323,8 @@
 	<div data-role="header">
 		<h1 id="aboutTitle"></h1>
 	</div>
-	<div data-role="content">	
-		<p>Olympia Arts Walk Mobile Guide</p>
-		<p>v1.0.0, September 2012</p>
-		<p>Developed by Esri&reg; for the City of Olympia, WA</p>
+	<div data-role="content">
+		<div id="aboutText"></div>
 	</div>
 </div>
 
@@ -1234,7 +1341,7 @@
 	</div>
 </div>
 
-<div data-role="page" id="friday" data-theme="d"> <!--the 'data-' attributes are additional functionality added by jquery mobile-->
+<div data-role="page" id="friday" data-theme="d"> <!--the 'data-' attributes are additional functionality added by jquery mobile. If you need to add page of events for a different day, copy this code and use it as a template.-->
 	<div data-role="header" data-theme="b">
 		<h1>Event Schedule</h1>
 		<a href="#index" data-rel="back" data-theme="b" data-icon="back" data-transition="slide" data-type="button" data-inline="true">Back</a>

@@ -48,6 +48,9 @@ var userConfig = {
 	
 	// Set application message
     ApplicationMessage: "Welcome! This app will function as your virtual guide while you visit Arts Walk. You can find businesses, artists, and events using the buttons below.",
+	
+	// Set application info
+	ApplicationAbout: "<p>Olympia Arts Walk Mobile Guide</p><p>v1.0.0, September 2012</p><p>Developed by Esri&reg; for the City of Olympia, WA</p>",
 
     // ------------------------------------------------------------------------------------------------------------------------
     // BASEMAP SETTINGS
